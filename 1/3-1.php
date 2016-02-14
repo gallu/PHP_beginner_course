@@ -22,6 +22,7 @@ $mikuji_string = $mikuji_array[$i];
 <html>
 
 <head>
+  <meta charset="UTF-8">
   <title>おみくじ</title>
 </head>
 

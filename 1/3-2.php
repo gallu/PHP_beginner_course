@@ -33,7 +33,7 @@
 
 ?>
 <html>
-<head><title>BMI計算</title></head>
+<head><title>BMI計算</title><meta charset="UTF-8"></head>
 <body>
 <h1>BMI計算</h1>
 <form action="bmi.php" method="get">
