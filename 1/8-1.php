@@ -1,6 +1,5 @@
 <?php
-
-for($i = 1; $i <= 31; $i ++) {
-  // �o��
-  echo "<option value='" , $i , "'>" , $i , "</option>\n";
+$i = 20;
+if (20 == $i) {
+  echo "変数 i は20と等しいです。";
 }
