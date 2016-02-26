@@ -1,14 +1,17 @@
 <?php
+// セッションの開始
+session_start();
+
 // カウンタ値の取得
-if (false === isset($_COOKIE['counter'])) {
+if (false === isset($_SESSION['counter'])) {
     $counter = 0;
+    $_SESSION['counter'] = 0;
 } else {
-    $counter = $_COOKIE['counter'];
+    $counter = $_SESSION['counter'];
 }
 
-// Cookieに新しい値を設定
-// Cookieの有効期限を30日に設定
-setcookie('counter', $counter + 1, time() + 60*60*24 * 30);
+// sessionに新しい値を設定
+$_SESSION['counter'] += 1;
 
 // 出力
 if (0 == $counter) {
@@ -18,4 +21,3 @@ if (0 == $counter) {
     echo htmlspecialchars($counter, ENT_QUOTES, 'UTF-8');
     echo "回いらっしゃいましたね!";
 }
-
