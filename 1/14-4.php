@@ -31,30 +31,10 @@ if (false === $r) {
     var_dump($pre->errorInfo());
 }
 
-// 表示用のテーブル開始タグ
-echo '<table border="1">';
-
 // データを取得する
 while($row = $pre->fetch(PDO::FETCH_ASSOC)) {
-    // 行の開始
-    echo '<tr>';
-
-    // ユーザID表示
-    echo '<td>';
-    echo htmlspecialchars($row['user_id'], ENT_QUOTES, 'UTF-8');
-
-    // 名前表示
-    echo '<td>';
-    echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');
-
-    // 年齢表示
-    echo '<td>';
-    echo htmlspecialchars($row['age'], ENT_QUOTES, 'UTF-8');
-
-    // 作成日時表示
-    echo '<td>';
-    echo htmlspecialchars($row['insert_date'], ENT_QUOTES, 'UTF-8');
+    // 一端、ざっくりと表示
+    var_dump($row);
 }
 
-// 表示用のテーブル終了タグ
-echo '</table>';
+

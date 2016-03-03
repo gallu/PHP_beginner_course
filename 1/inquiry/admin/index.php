@@ -1,5 +1,4 @@
 <?php
-
 // DBに接続
 $user = 'root';
 $pass = '';
@@ -16,22 +15,27 @@ $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 //
 //var_dump($dbh);
 
+// タイムゾーンの設定
+date_default_timezone_set('Asia/Tokyo');
+
 // 「準備されたSQL文」を用意
-$sql = 'INSERT INTO test_users(user_id, name, age, insert_date) VALUES( :user_id ,  :name , :age, :insert_date );';
+$sql = 'SELECT * FROM inquiry_data;';
 $pre = $dbh->prepare($sql);
 
 // 値を紐づける
-$pre->bindValue(':user_id', 1);
-$pre->bindValue(':name', '山田太郎');
-$pre->bindValue(':age', 20);
-$pre->bindValue(':insert_date', date('Y-m-d H:i:s'));
+// XXX 今回はなし
 
 // SQL文を発行する
 $r = $pre->execute();
 if (false === $r) {
-    // エラーが発生したので表示(本番では出さないこと!!)
+    // エラーが発生したので表示
     var_dump($pre->errorInfo());
+    return;
 }
 
-// 終了したので簡単にメッセージ
-echo 'SQL insert fin.';
+// データを取得する
+while($row = $pre->fetch(PDO::FETCH_ASSOC)) {
+    // 一端、ざっくりと表示
+    var_dump($row);
+}
+

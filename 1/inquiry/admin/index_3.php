@@ -1,5 +1,4 @@
 <?php
-
 // DBに接続
 $user = 'root';
 $pass = '';
@@ -16,20 +15,26 @@ $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 //
 //var_dump($dbh);
 
+// タイムゾーンの設定
+date_default_timezone_set('Asia/Tokyo');
 
 // 「準備されたSQL文」を用意
-$sql = 'SELECT * FROM test_users;';
+$sql = 'SELECT * FROM inquiry_data ORDER BY inquiry_id DESC;';
 $pre = $dbh->prepare($sql);
 
 // 値を紐づける
-// XXX 今回は紐づける値はなし
+// XXX 今回はなし
 
 // SQL文を発行する
 $r = $pre->execute();
 if (false === $r) {
-    // エラーが発生したので表示(本番では出さないこと!!)
+    // エラーが発生したので表示
     var_dump($pre->errorInfo());
+    return;
 }
+
+// 軽くヘッダを表示
+echo '<h1>問い合わせ一覧</h1>';
 
 // 表示用のテーブル開始タグ
 echo '<table border="1">';
@@ -39,17 +44,27 @@ while($row = $pre->fetch(PDO::FETCH_ASSOC)) {
     // 行の開始
     echo '<tr>';
 
-    // ユーザID表示
+    // ID表示
     echo '<td>';
-    echo htmlspecialchars($row['user_id'], ENT_QUOTES, 'UTF-8');
+    echo htmlspecialchars($row['inquiry_id'], ENT_QUOTES, 'UTF-8');
+    echo '(<a href="./detail.php?id=';
+    echo urlencode($row['inquiry_id']);
+    echo '">詳細を見る</a>)';
 
     // 名前表示
     echo '<td>';
     echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');
 
-    // 年齢表示
+    // 連絡先表示
     echo '<td>';
-    echo htmlspecialchars($row['age'], ENT_QUOTES, 'UTF-8');
+    echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8');
+
+    // 問い合わせ内容表示
+    echo '<td>';
+    echo '<pre>';
+    $s = mb_substr($row['inquiry'], 0, 20, 'UTF-8'); // 先頭から20文字切り出す
+    echo htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    echo '</pre>';
 
     // 作成日時表示
     echo '<td>';
@@ -58,3 +73,4 @@ while($row = $pre->fetch(PDO::FETCH_ASSOC)) {
 
 // 表示用のテーブル終了タグ
 echo '</table>';
+

@@ -15,4 +15,3 @@ try {
 $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 //
 var_dump($dbh);
-
