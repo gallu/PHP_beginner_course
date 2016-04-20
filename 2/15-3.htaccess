@@ -1,0 +1,4 @@
+# エラー表示をonにする
+php_value display_errors 1
+# 出力する PHP エラーの種類を設定する(PHPバージョンが変わると数値が変更になる可能性があるので注意)
+php_value error_reporting 32767

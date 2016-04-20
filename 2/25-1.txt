@@ -1,0 +1,65 @@
+http://localhost/25-1.php
+
+GET /25-1.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: ja,en-US;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Cache-Control: max-age=0
+
+HTTP/1.1 200 OK
+Date: Thu, 14 Apr 2016 13:24:15 GMT
+Server: Apache/2.4.17 (Win32) OpenSSL/1.0.2d PHP/5.6.15
+X-Powered-By: PHP/5.6.15
+Set-Cookie: num=96; expires=Fri, 15-Apr-2016 13:24:15 GMT; Max-Age=86400
+Content-Length: 19
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html; charset=UTF-8
+----------------------------------------------------------
+http://localhost/25-1.php
+
+GET /25-1.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: ja,en-US;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Cookie: num=96
+Connection: keep-alive
+Cache-Control: max-age=0
+
+HTTP/1.1 200 OK
+Date: Thu, 14 Apr 2016 13:24:17 GMT
+Server: Apache/2.4.17 (Win32) OpenSSL/1.0.2d PHP/5.6.15
+X-Powered-By: PHP/5.6.15
+Set-Cookie: num=865; expires=Fri, 15-Apr-2016 13:24:17 GMT; Max-Age=86400
+Content-Length: 48
+Keep-Alive: timeout=5, max=99
+Connection: Keep-Alive
+Content-Type: text/html; charset=UTF-8
+----------------------------------------------------------
+http://localhost/25-1.php
+
+GET /25-1.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: ja,en-US;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Cookie: num=865
+Connection: keep-alive
+Cache-Control: max-age=0
+
+HTTP/1.1 200 OK
+Date: Thu, 14 Apr 2016 13:24:18 GMT
+Server: Apache/2.4.17 (Win32) OpenSSL/1.0.2d PHP/5.6.15
+X-Powered-By: PHP/5.6.15
+Set-Cookie: num=769; expires=Fri, 15-Apr-2016 13:24:18 GMT; Max-Age=86400
+Content-Length: 49
+Keep-Alive: timeout=5, max=98
+Connection: Keep-Alive
+Content-Type: text/html; charset=UTF-8
+----------------------------------------------------------
