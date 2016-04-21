@@ -23,4 +23,4 @@ header('Location: http://www.phpexam.jp/');
 
 
 // 出力バッファリング終了
-os_end_flush();
+ob_end_flush();

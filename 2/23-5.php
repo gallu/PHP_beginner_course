@@ -14,7 +14,7 @@ if (true === isset($_POST['name'])) {
 }
 ?>
 <br>
-<form action="./23-1.php" method="post">
+<form action="./23-5.php" method="post">
 名前：<input type="text" name="name"><br>
 <br>
 <input type="submit" value="確認する">
