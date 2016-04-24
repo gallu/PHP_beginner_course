@@ -22,7 +22,7 @@ if ('' === $csrf_token) {
 }
 
 // CSRFトークンは5個まで(で後で追加するので、ここでは4個以下に)
-while (5 <= count($_SESSION['csrf_token'])) {
+while (5 <= count(@$_SESSION['csrf_token'])) {
     array_shift($_SESSION['csrf_token']);
 }
 
