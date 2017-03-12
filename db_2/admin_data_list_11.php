@@ -23,17 +23,6 @@ if ('' === $sort) {
 // 確認
 var_dump($sort);
 
-
-// ソートパラメタの取得
-$sort = (string)@$_GET['sort'];
-// デフォルトの設定
-if ('' === $sort) {
-    $sort = 'test_form_id';
-}
-// 確認
-var_dump($sort);
-
-
 // DBハンドルの取得
 $dbh = get_dbh();
 
