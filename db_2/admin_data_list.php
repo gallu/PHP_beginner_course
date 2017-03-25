@@ -1,8 +1,5 @@
 <?php
 
-ini_set("display_errors", 1);
-error_reporting(-1);
-
 /*
  * (管理画面想定)情報の一覧
  */
@@ -130,7 +127,7 @@ if (false === empty($search)) {
         // WHERE句に入れる文言を設定する
         $where_list[] = 'name LIKE :like_name';
         // BINDする値を設定する
-        //$bind_array[':like_name'] = '%' . $search['search_like_name']; // 前方一致の場合
+        //$bind_array[':like_name'] = $search['search_like_name'] . '%'; // 前方一致の場合
         //$bind_array[':like_name'] = '%' . $search['search_like_name'] . '%'; // 部分一致の場合
         $bind_array[':like_name'] = '%' . like_escape($search['search_like_name']) . '%'; // 部分一致、%や_はエスケープ、の場合
     }
@@ -139,7 +136,7 @@ if (false === empty($search)) {
         // WHERE句に入れる文言を設定する
         $where_list[] = 'post LIKE :like_post';
         // BINDする値を設定する
-        //$bind_array[':like_post'] = '%' . $search['search_like_post']; // 前方一致の場合
+        //$bind_array[':like_post'] = $search['search_like_post'] . '%'; // 前方一致の場合
         //$bind_array[':like_post'] = '%' . $search['search_like_post'] . '%'; // 部分一致の場合
         $bind_array[':like_post'] = '%' . like_escape($search['search_like_post']) . '%'; // 部分一致、%や_はエスケープ、の場合
     }
