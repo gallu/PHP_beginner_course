@@ -1,7 +1,7 @@
 <?php
 
 // 認証処理のinclude
-require_once('auth.php');
+require_once('auth_fee.php');
 
 ?>
 <!DOCTYPE HTML>
@@ -15,9 +15,7 @@ require_once('auth.php');
 </head>
 
 <body>
-  <h1>ログイン後TopPage</h1>
-  <a href="./page_fee.php">有料Page</a><br>
-  <a href="./logout.php">ログアウト</a>
+  <h1>有料のみのPage</h1>
 
 </body>
 </html>
