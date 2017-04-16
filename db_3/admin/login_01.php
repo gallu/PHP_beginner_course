@@ -9,8 +9,8 @@ ob_start();
 session_start();
 
 // 共通関数のinclude
-require_once('common_function.php');
-require_once('common_auth.php');
+require_once('../common_function.php');
+require_once('../common_auth.php');
 
 // 日付関数(date)を(後で)使うのでタイムゾーンの設定
 date_default_timezone_set('Asia/Tokyo');
@@ -21,7 +21,7 @@ $user_input_data = array();
 $error_detail = array();
 
 // 「パラメタの一覧」を把握
-$params = array('email', 'pass');
+$params = array('id', 'pass');
 // データを取得する ＋ 必須入力のvalidate
 foreach($params as $p) {
     $user_input_data[$p] = (string)@$_POST[$p];
@@ -37,7 +37,7 @@ if (false === empty($error_detail)) {
     // エラー情報をセッションに入れて持ちまわる
     $_SESSION['output_buffer'] = $error_detail;
     // メアドは保持する
-    $_SESSION['output_buffer']['email'] = $user_input_data['email'];
+    $_SESSION['output_buffer']['id'] = $user_input_data['id'];
 
     // 入力ページに遷移する
     header('Location: ./index.php');
@@ -50,10 +50,10 @@ $dbh = get_dbh();
 
 // ------------------------------
 // 準備された文(プリペアドステートメント)の用意
-$sql = 'SELECT * FROM users WHERE email=:email;';
+$sql = 'SELECT * FROM admin_users WHERE user_id=:user_id;';
 $pre = $dbh->prepare($sql);
 // 値のバインド
-$pre->bindValue(':email', $user_input_data['email'], PDO::PARAM_STR);
+$pre->bindValue(':user_id', $user_input_data['id'], PDO::PARAM_STR);
 // SQLの実行
 $r = $pre->execute();
 if (false === $r) {
@@ -67,7 +67,7 @@ $datum = $pre->fetch(PDO::FETCH_ASSOC);
 //var_dump($datum);
 
 // ログイン処理(共通化)
-$login_flg = login($user_input_data['pass'], $datum, 'user_login_lock');
+$login_flg = login($user_input_data['pass'], $datum, 'admin_user_login_lock');
 
 //var_dump($login_flg);
 
@@ -78,7 +78,7 @@ if (false === $login_flg) {
     // エラー情報をセッションに入れて持ちまわる
     $_SESSION['output_buffer']['error_invalid_login'] = true;
     // メアドは保持する
-    $_SESSION['output_buffer']['email'] = $user_input_data['email'];
+    $_SESSION['output_buffer']['id'] = $user_input_data['id'];
 
     // 入力ページに遷移する
     header('Location: ./index.php');
@@ -91,10 +91,12 @@ if (false === $login_flg) {
 // セッションIDを張り替える：
 session_regenerate_id(true);
 // 「ログインできている」という情報をセッション内に格納する
-$_SESSION['auth']['user_id'] = $datum['user_id'];
-$_SESSION['auth']['name'] = $datum['name'];
-$_SESSION['auth']['role'] = $datum['role'];
+$_SESSION['admin_auth']['user_id'] = $datum['user_id'];
+$_SESSION['admin_auth']['name'] = $datum['name'];
+$_SESSION['admin_auth']['role'] = $datum['role'];
 
 // TopPage(認証後トップページ)に遷移させる
-header('Location: ./top.php');
+//header('Location: ./top.php');
+
+echo 'ログインできました';
 
