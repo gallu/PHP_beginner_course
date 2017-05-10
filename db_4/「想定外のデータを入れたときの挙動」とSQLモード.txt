@@ -1,0 +1,91 @@
+# MySQL コンソールにログイン
+c:\xampp\mysql\bin\mysql -u root test
+
+-- SQLモードの確認
+-- SESSIONをGLOBALにすると「恒久的(MySQLサーバが落ちるまで有効)」となるが、アカウントに一定の権限が必要
+SELECT @@SESSION.sql_mode;
+
+-- 一端(わかりやすいように)SQLモードを空にする
+SET SESSION sql_mode = '';
+
+-- 確認に使うテーブルを作成
+CREATE TABLE sql_mode_check (
+  t_date datetime,
+  t_string varchar(4),
+  t_int tinyint,
+  comment varchar(255)
+);
+
+-- 範囲外の日時を指定
+INSERT INTO sql_mode_check(t_date, comment) VALUES('2017-04-31 11:22:33', 'in 2017-04-31 11:22:33');
+-- 「Query OK, 1 row affected, "1 warning (0.00 sec)"」？
+SHOW WARNINGS;
+-- データを確認
+SELECT * FROM sql_mode_check \G
+
+-- varchar の文字列溢れ
+INSERT INTO sql_mode_check(t_string, comment) VALUES('abcdefg', 'in abcdefg');
+SHOW WARNINGS;
+SELECT * FROM sql_mode_check \G
+
+-- 数値の範囲超え
+INSERT INTO sql_mode_check(t_int, comment) VALUES(512, 'in 512');
+SHOW WARNINGS;
+SELECT * FROM sql_mode_check \G
+
+
+-- 確認に使うテーブルを作成その２
+CREATE TABLE sql_mode_check2 (
+  t_id int unsigned not null AUTO_INCREMENT,
+  t_string varchar(4) NOT NULL,
+  comment varchar(255),
+  PRIMARY KEY(t_id)
+);
+-- NOT NULL補完(NOT NULL無視されるの？？？)
+INSERT INTO sql_mode_check2(comment) VALUES('in NULL');
+SHOW WARNINGS;
+SELECT * FROM sql_mode_check2 \G
+
+-- AUTO_INCREMENTで、idに0を渡す(厳格な場合、NULLのみがインクリの対象になる)
+INSERT INTO sql_mode_check2(t_id, t_string, comment) VALUES(0, '', 'in 0');
+SHOW WARNINGS;
+SELECT * FROM sql_mode_check2 \G
+
+--------------
+-- モードを厳格にする
+SET SESSION sql_mode = 'TRADITIONAL,NO_AUTO_VALUE_ON_ZERO';
+SELECT @@SESSION.sql_mode;
+
+-- テストデータを一端削除
+DELETE FROM sql_mode_check;
+DELETE FROM sql_mode_check2;
+
+
+-- 範囲外の日時を指定
+INSERT INTO sql_mode_check(t_date, comment) VALUES('2017-04-31 11:22:33', 'in 2017-04-31 11:22:33');
+-- データを確認
+SELECT * FROM sql_mode_check \G
+
+-- varchar の文字列溢れ
+INSERT INTO sql_mode_check(t_string, comment) VALUES('abcdefg', 'in abcdefg');
+SELECT * FROM sql_mode_check \G
+
+-- 数値の範囲超え
+INSERT INTO sql_mode_check(t_int, comment) VALUES(512, 'in 512');
+SELECT * FROM sql_mode_check \G
+
+
+-- NOT NULL補完(NOT NULL無視されるの？？？)
+INSERT INTO sql_mode_check2(comment) VALUES('in NULL');
+SHOW WARNINGS;
+SELECT * FROM sql_mode_check2 \G
+
+-- AUTO_INCREMENTで、idに0を渡す(厳格な場合、NULLのみがインクリの対象になる)
+INSERT INTO sql_mode_check2(t_id, t_string, comment) VALUES(0, '', 'in 0');
+SELECT * FROM sql_mode_check2 \G
+INSERT INTO sql_mode_check2(t_id, t_string, comment) VALUES(0, '', 'in 0');
+SELECT * FROM sql_mode_check2 \G
+
+
+
+

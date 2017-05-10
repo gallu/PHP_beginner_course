@@ -1,0 +1,124 @@
+-----------------
+-- 事前準備
+-----------------
+
+-- ECサイトにおける「１商品の在庫」を管理するテーブル
+DROP TABLE IF EXISTS stocks;
+CREATE TABLE stocks (
+   item_id int unsigned not null,
+   stock int unsigned not null,
+   primary key(`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- 「請求書」テーブル(実際には「ユーザID」その他様々な情報があるはずだが、一端オミット)
+DROP TABLE IF EXISTS bills;
+CREATE TABLE bills (
+   bill_id int unsigned not null auto_increment,
+   amount int unsigned not null,
+   primary key(`bill_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 事前準備
+insert into stocks(item_id, stock) values(1, 10);
+
+--
+select * from stocks;
+
+
+/*
+ -------------------------------------------------
+ */
+-- 普通に購入してみる
+SELECT * FROM stocks WHERE item_id=1; -- 在庫確認
+UPDATE stocks SET stock=9 WHERE item_id=1; -- 在庫を減らす
+INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる
+-- 確認
+SELECT * FROM stocks;
+SELECT * FROM bills;
+
+-- ×「SQLの一部がエラーになった」時に巻き戻しがきかない
+SELECT * FROM stocks WHERE item_id=1; -- 在庫確認
+UPDATE stocks SET stock=8 WHERE item_id=1; -- 在庫を減らす
+INSERT INTO bills(amount) VALUES(NULL); -- 請求を上げる所でエラー
+-- 巻き戻し処理をしないと「在庫が減っているのに請求が上がっていない」ので困る
+-- 今回は「在庫を戻せばいい」だけなのだけど、SQLがいくつも連続して「ひとまとめ」の時に面倒
+-- 確認
+SELECT * FROM stocks;
+SELECT * FROM bills;
+
+
+-- 「SQLの一部がエラーになった」時に、トランザクションがあると巻き戻せる
+BEGIN; -- トランザクション開始
+SELECT * FROM stocks WHERE item_id=1; -- 在庫確認
+UPDATE stocks SET stock=7 WHERE item_id=1; -- 在庫を減らす
+SELECT * FROM stocks; -- 確認
+INSERT INTO bills(amount) VALUES(NULL); -- 請求を上げる所でエラー
+ROLLBACK; -- 巻き戻し処理
+-- 確認
+SELECT * FROM stocks;
+SELECT * FROM bills;
+
+
+-- ×２ユーザが同時に(トランザクション無しで)購入してみる：「切らない時の問題」
+SELECT * FROM stocks WHERE item_id=1; -- 在庫確認(A)
+		SELECT * FROM stocks WHERE item_id=1; -- 在庫確認(B)
+		UPDATE stocks SET stock=7 WHERE item_id=1; -- 在庫を減らす(B)
+UPDATE stocks SET stock=7 WHERE item_id=1; -- 在庫を減らす(A)
+INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる(A)
+		INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる(B)
+-- 確認
+SELECT * FROM stocks;
+SELECT * FROM bills;
+
+
+-- ×２ユーザが同時に、トランザクションありで購入してみる：「「SELECT FOR UPDATEを忘れた時」の問題」
+BEGIN; -- トランザクション開始
+SELECT * FROM stocks WHERE item_id=1; -- 在庫確認(A)
+		BEGIN; -- トランザクション開始
+		SELECT * FROM stocks WHERE item_id=1; -- 在庫確認(B)
+		UPDATE stocks SET stock=6 WHERE item_id=1; -- 在庫を減らす(B)
+UPDATE stocks SET stock=6 WHERE item_id=1; -- 在庫を減らす(A)：少し止まる
+INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる(A)
+COMMIT; -- 変更の確定(A)
+		INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる(B)
+		COMMIT; -- 変更の確定(B)
+-- 確認
+SELECT * FROM stocks;
+SELECT * FROM bills;
+
+
+-- ２ユーザが同時に、トランザクションありで購入してみる：「「SELECT FOR UPDATEを忘れた時」の問題」の解決
+BEGIN; -- トランザクション開始
+SELECT * FROM stocks WHERE item_id=1 FOR UPDATE; -- 在庫確認(A)
+		BEGIN; -- トランザクション開始
+		SELECT * FROM stocks WHERE item_id=1 FOR UPDATE; -- 在庫確認(B)
+UPDATE stocks SET stock=5 WHERE item_id=1; -- 在庫を減らす(A)
+INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる(A)
+COMMIT; -- 変更の確定(A)
+		UPDATE stocks SET stock=5 WHERE item_id=1; -- 在庫を減らす(B)
+		INSERT INTO bills(amount) VALUES(1000); -- 請求を上げる(B)
+		COMMIT; -- 変更の確定(B)
+-- 確認
+SELECT * FROM stocks;
+SELECT * FROM bills;
+
+
+-- デッドロックについて少し
+-- 例題として「複数の商品を購入」
+
+-- 前提
+insert into stocks(item_id, stock) values(2, 10);
+insert into stocks(item_id, stock) values(3, 10);
+
+-- デッドロック確認
+BEGIN; -- トランザクション開始
+	BEGIN; -- トランザクション開始
+SELECT * FROM stocks WHERE item_id=2 FOR UPDATE; -- 商品２の在庫確認(A)
+	SELECT * FROM stocks WHERE item_id=3 FOR UPDATE; -- 商品３の在庫確認(B)
+SELECT * FROM stocks WHERE item_id=3 FOR UPDATE; -- 商品３の在庫確認(A)
+	SELECT * FROM stocks WHERE item_id=2 FOR UPDATE; -- 商品２の在庫確認(B)：このタイミングで「MySQLがデッドロックを検出して」エラーを出してくれる
+-- 以下省略
+
+
+

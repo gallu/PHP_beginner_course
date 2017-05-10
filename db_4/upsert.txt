@@ -1,0 +1,55 @@
+-- REPLACE
+-- フォーマットはほぼINSERT文
+-- キーが重複している場合「重複しているkeyのレコードをdeleteしてからinsert」
+REPLACE INTO テーブル名(カラム名,カラム名,...)
+      VALUES(値, 値, 値, ...);
+
+
+-- INSERT ... ON DUPLICATE KEY UPDATE
+-- フォーマットは、ほぼ「INSERT文にUPDATE文を足したもの」
+-- キーが重複している場合「ON DUPLICATE KEY UPDATE以降の、UPDATE SET相当の文を実行(するので、レコードへのUPDATE)」
+INSERT INTO テーブル名(カラム名,カラム名,...)
+     VALUES(値, 値, 値, ...)
+     ON DUPLICATE KEY UPDATE
+         カラム名=値, カラム名=値, ...;
+
+
+-- 前提になるテーブル
+CREATE TABLE upsert_test (
+  upsert_test_id  int not null,
+  data varchar(255) not null,
+  PRIMARY KEY(`upsert_test_id`)
+);
+-- 前提になるデータ
+INSERT INTO upsert_test(upsert_test_id, data) VALUES(1, '1st data');
+--
+SELECT * FROM upsert_test;
+
+
+-- REPLACE の時のプリペアドステートメントの書き方
+REPLACE INTO upsert_test(upsert_test_id, data) VALUES(1, '1st data REPLACE');
+REPLACE INTO upsert_test(upsert_test_id, data) VALUES(2, '2nd data REPLACE');
+--
+SELECT * FROM upsert_test;
+
+
+-- INSERT ... ON DUPLICATE KEY UPDATE の時のプリペアドステートメントの書き方
+INSERT INTO upsert_test(upsert_test_id, data) VALUES(1, '1st data DUPLICATE KEY UPDATE') ON DUPLICATE KEY UPDATE data='1st data DUPLICATE KEY UPDATE 2';
+INSERT INTO upsert_test(upsert_test_id, data) VALUES(3, '3rd data DUPLICATE KEY UPDATE') ON DUPLICATE KEY UPDATE data='3rd data DUPLICATE KEY UPDATE 2';
+--
+SELECT * FROM upsert_test;
+
+
+// ---------------------------------------------------------------------
+// INSERT ON DUPLICATE KEY UPDATEの時のプリペアドステートメントの書き方
+// ---------------------------------------------------------------------
+// 準備された文
+$sql = 'INSERT INTO upsert_test(upsert_test_id, data) VALUES(:upsert_test_id, :data) ON DUPLICATE KEY UPDATE data=:data_u;';
+$pre = $dbh->prepare($sql);
+// 値のバインド
+$pre->bindValue(':upsert_test_id', (int)$upsert_test_id, PDO::PARAM_INT);
+$pre->bindValue(':data', $data);
+$pre->bindValue(':data_u', $data);
+// SQLの実行
+$r = $pre->execute();
+// XXX 以下略

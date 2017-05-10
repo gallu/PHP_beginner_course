@@ -1,0 +1,95 @@
+// セッション関連の情報の確認
+var_dump('session.save_handler', ini_get('session.save_handler'));
+var_dump('session.save_path', ini_get('session.save_path'));
+
+
+// ----------------------------------
+// デフォルトでのセッション(ファイルへの保存)の確認
+
+// セッション開始
+session_start();
+// セッションIDの表示(ファイル名を探すために)
+var_dump(session_id());
+// セッション内にデータを入れる
+$_SESSION['session_test'] = 'test';
+
+
+
+// ----------------------------------
+// セッション情報をDBで扱うためのクラス(大まかな原型)
+
+-- 予測されるテーブルのフォーマット
+DROP TABLE IF EXISTS user_sessions;
+CREATE TABLE user_sessions (
+   session_id varbinary(256) NOT NULL COMMENT 'セッションID', -- session.sid_lengthの「セッション ID 文字列の長さを指定します。 22 から 256 までの値が使えます」を基準に、256
+   session_data LONGBLOB NOT NULL COMMENT 'セッション情報', -- 「かなり大きなセッションデータ」を持つケースもあるので(性能的にあまり嬉しくないが)
+   updated datetime NOT NULL COMMENT '更新日時', -- メソッド gc() で使うカラムなので
+   INDEX (`updated`),
+   PRIMARY KEY(`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+/**
+ * セッション情報をDBで管理するためのクラス
+ */
+
+class クラス名 implements SessionHandlerInterface {
+
+  /**
+   * セッションを開始する際に呼び出される。処理は「特になし」または「DBハンドルを(外部から)取得する」のいずれかである事が多い
+   *
+   * @return bool
+   */
+  public function open($savePath, $saveName) {
+    return true;
+  }
+
+  /**
+   * セッションを閉じる際に呼び出される。処理は特になし
+   *
+   * @return bool
+   */
+  public function close() {
+    return true;
+  }
+
+  /**
+   * セッションのデータを読み込む。対象のレコードを取り出してデータを返す
+   *
+   * @param  string $id セッションID
+   * @return string セッションのデータ(存在しない場合は空文字)
+   */
+  public function read($id) {
+    return '';
+  }
+
+  /**
+   * セッションのデータを書き込む
+   * @param  string $id セッションID
+   * @param  string $data セッションのデータ $_SESSIONをシリアライズしたもの
+   * @return bool 書き込みに成功したらtrue、失敗したらfalse
+   */
+  public function write($id, $data) {
+    return true;
+  }
+
+  /**
+   * セッションを破棄する(意図的な破壊：session_regenerate_id(true) や session_destroy() の時)
+   * @param  string $id セッションID
+   * @return bool 破壊に成功したらtrue、失敗したらfalse
+   */
+  public function destroy($id) {
+    return true;
+  }
+
+  /**
+   * 古いセッションを削除する(GCによる破壊)
+   * @param  string $maxlifetime セッションのライフタイム session.gc_maxlifetimeの値
+   * @return bool 削除に成功したらtrue、失敗したらfalse
+   */
+  public function gc($maxlifetime) {
+    return true;
+  }
+
+}
+

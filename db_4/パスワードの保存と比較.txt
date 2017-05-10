@@ -1,0 +1,87 @@
+/*
+ * 「個別のソルト＋ストレッチ」の実装の仕方
+ */
+// hash化
+// ---------------
+// 生のパスワード：実際には入力値になる
+$raw_pass = 'pass';
+
+// saltの作成
+// XXX ざっくりした長さでよいので、一端md5を選択
+$salt = md5( openssl_random_pseudo_bytes(128) ); // XXX 乱数はある程度何をつかってもよいが、念のために多少の強度を持たせておく
+// ストレッチの回数：実際にはconfig等にはじき出す
+$stretching_num = 1000;
+
+// ストレッチ
+function stretching($salt, $raw_pass, $stretching_num) {
+    $ret = $raw_pass;
+    for($i = 0; $i < $stretching_num; ++$i) {
+        // 「ある程度の強度」のhashが欲しいので、sha256を一端選択
+        $ret = hash('sha256', $salt . $ret);
+    }
+    return $ret;
+}
+// 
+$pass = stretching($salt, $raw_pass, $stretching_num);
+// DB保存用の情報を作成する
+$db_pass = "{$salt}#{$stretching_num}#{$pass}";
+var_dump($db_pass);
+
+
+// 比較
+// ---------------
+// hash_equals()を使うとタイミング攻撃に強くなるが、PHP 5 >= 5.6.0 である
+// 生のパスワード：実際には入力値になる
+$raw_pass = 'pass';
+// DBから取得された(上述で計算した)hashedなパスワード文字列：実際にはDBから取得した値
+$db_pass = $db_pass;
+
+// 情報の分解
+list($salt, $stretching_num, $hashed_pass) = explode('#', $db_pass);
+var_dump($salt, $stretching_num, $hashed_pass);
+// hashed パスワードを計算
+$pass = stretching($salt, $raw_pass, $stretching_num);
+var_dump($pass);
+
+//
+if (hash_equals($pass, $hashed_pass)) {
+    echo "パスワードが一致しました";
+} else {
+    echo "パスワードは不一致です";
+}
+// 5.6.0未満の場合
+if ($pass === $hashed_pass) {
+    echo "パスワードが一致しました";
+} else {
+    echo "パスワードは不一致です";
+}
+
+
+
+
+/*
+ * password_hash()関数
+ */
+
+// hash化
+// ---------------
+// 生のパスワード：実際には入力値になる
+$raw_pass = 'pass';
+
+// ハッシュ化
+$db_pass = password_hash($raw_pass, PASSWORD_DEFAULT);
+var_dump($db_pass);
+
+
+// 比較
+// ---------------
+// 生のパスワード：実際には入力値になる
+$raw_pass = 'pass';
+// DBから取得された(上述で計算した)hashedなパスワード文字列：実際にはDBから取得した値
+$db_pass = $db_pass;
+if (password_verify($raw_pass, $db_pass)) {
+    echo "パスワードが一致しました";
+} else {
+    echo "パスワードは不一致です";
+}
+

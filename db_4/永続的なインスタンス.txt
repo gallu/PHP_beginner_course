@@ -1,0 +1,66 @@
+// serializeによる、インスタンスの文字列化
+
+<pre>
+<?php
+
+// 配列：中に文字と数値と真偽値
+$awk = array(
+  'abc',
+  1,
+  0.5,
+  true,
+  NULL
+);
+$s = serialize($awk);
+var_dump($s);
+
+// クラス
+class hoge {
+};
+$obj = new hoge();
+$s = serialize($obj);
+var_dump($s);
+
+// 一応「単体のスカラー」も扱えるよ
+$s = serialize('abc');
+var_dump($s);
+$s = serialize(1);
+var_dump($s);
+$s = serialize(false);
+var_dump($s);
+
+// XXX リソースは駄目
+// XXX 「エラーを吐く」わけではないので、たっぷりと注意
+$fp = fopen(__FILE__, 'r');
+var_dump($fp);
+$s = serialize($fp);
+var_dump($s);
+
+
+// 「Cookie(等の外部起因の値)に仕込む」時の危険性
+	オブジェクトインジェクション
+
+
+
+// Cookieの時はJSONでやり取りする
+
+<pre>
+<?php
+
+// 配列：中に文字と数値と真偽値
+$awk = array(
+  'abc',
+  1,
+  0.5,
+  true,
+  NULL
+);
+$s = json_encode($awk);
+var_dump($s);
+
+// クラス
+class hoge {
+};
+$obj = new hoge();
+$s = json_encode($obj);
+var_dump($s);

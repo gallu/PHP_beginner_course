@@ -1,0 +1,25 @@
+-- テーブルを準備
+DROP TABLE IF EXISTS float_test;
+CREATE TABLE float_test (
+    f float
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- データを入れる
+INSERT INTO float_test(f) VALUES(0.5);
+INSERT INTO float_test(f) VALUES(0.25);
+INSERT INTO float_test(f) VALUES(0.125);
+INSERT INTO float_test(f) VALUES(100);
+INSERT INTO float_test(f) VALUES(0.1);
+INSERT INTO float_test(f) VALUES(59.95);
+
+-- 目視で確認
+SELECT f FROM float_test;
+
+-- 目視で確認2
+SELECT f*1 FROM float_test;
+
+-- 選択する
+SELECT f FROM float_test WHERE f=0.1;
+SELECT f FROM float_test WHERE f=0.5;
+SELECT f FROM float_test WHERE f=100;
+SELECT f FROM float_test WHERE f=59.95;
